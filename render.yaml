@@ -1,0 +1,24 @@
+# One-click deploy: https://render.com/deploy?repo=<your repo URL>
+# After the first deploy, add <your onrender.com URL>/auth/spotify/callback
+# as a Redirect URI in your Spotify app.
+services:
+  - type: web
+    name: cmdshift
+    runtime: docker
+    plan: free
+    healthCheckPath: /healthz
+    autoDeploy: true
+    envVars:
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: SPOTIFY_CLIENT_ID
+        sync: false
+      - key: SPOTIFY_CLIENT_SECRET
+        sync: false
+      - key: APPLE_TEAM_ID
+        sync: false
+      - key: APPLE_KEY_ID
+        sync: false
+      # Paste the .p8 contents, or `base64 -w0 AuthKey_XXX.p8`
+      - key: APPLE_PRIVATE_KEY
+        sync: false

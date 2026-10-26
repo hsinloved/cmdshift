@@ -6,37 +6,32 @@ import { fileURLToPath } from 'node:url';
 import * as spotify from './lib/spotify.js';
 import * as apple from './lib/apple.js';
 import { parseTrackList } from './lib/match.js';
+import { loadSession, sessionKey } from './lib/session.js';
 
 const PORT = Number(process.env.PORT) || 8888;
-const BASE_URL = (process.env.BASE_URL || `http://127.0.0.1:${PORT}`).replace(/\/$/, '');
+const HOST = process.env.HOST || '127.0.0.1';
+// RENDER_EXTERNAL_URL is set automatically on Render.
+const BASE_URL = (process.env.BASE_URL || process.env.RENDER_EXTERNAL_URL || `http://127.0.0.1:${PORT}`).replace(/\/$/, '');
+const SECURE = BASE_URL.startsWith('https:');
 const SPOTIFY_REDIRECT = `${BASE_URL}/auth/spotify/callback`;
 const PUBLIC_DIR = fileURLToPath(new URL('./public/', import.meta.url));
 const MAX_BODY = 2 * 1024 * 1024;
 
-// In-memory sessions — fine for a personal/simple deployment.
-const sessions = new Map();
-const SESSION_TTL = 7 * 24 * 3600 * 1000;
-
-function getSession(req, res) {
-  const sid = /(?:^|;\s*)sid=([a-f0-9]{48})/.exec(req.headers.cookie || '')?.[1];
-  const existing = sid && sessions.get(sid);
-  if (existing && existing.expires > Date.now()) return existing;
-  const id = randomBytes(24).toString('hex');
-  const s = { id, expires: Date.now() + SESSION_TTL };
-  sessions.set(id, s);
-  const secure = BASE_URL.startsWith('https:') ? '; Secure' : '';
-  res.setHeader('Set-Cookie', `sid=${id}; HttpOnly; SameSite=Lax; Path=/; Max-Age=${SESSION_TTL / 1000}${secure}`);
-  return s;
+if (!process.env.SESSION_SECRET) {
+  console.warn('  ! SESSION_SECRET not set — using a random one; Spotify logins will reset on restart');
 }
+const SESSION_KEY = sessionKey(process.env.SESSION_SECRET || randomBytes(32).toString('hex'));
 
-setInterval(() => {
-  const now = Date.now();
-  for (const [id, s] of sessions) if (s.expires < now) sessions.delete(id);
-}, 3600_000).unref();
+const SECURITY_HEADERS = {
+  'X-Content-Type-Options': 'nosniff',
+  'Referrer-Policy': 'strict-origin-when-cross-origin',
+  'X-Frame-Options': 'DENY',
+  ...(SECURE ? { 'Strict-Transport-Security': 'max-age=31536000' } : {}),
+};
 
 function send(res, status, body, headers = {}) {
   const isJson = typeof body !== 'string';
-  res.writeHead(status, { 'Content-Type': isJson ? 'application/json' : 'text/plain; charset=utf-8', ...headers });
+  res.writeHead(status, { 'Content-Type': isJson ? 'application/json' : 'text/plain; charset=utf-8', ...SECURITY_HEADERS, ...headers });
   res.end(isJson ? JSON.stringify(body) : body);
 }
 
@@ -63,7 +58,11 @@ async function serveStatic(pathname, res) {
   if (!file.startsWith(PUBLIC_DIR)) return send(res, 403, 'Forbidden');
   try {
     const data = await readFile(file);
-    res.writeHead(200, { 'Content-Type': MIME[extname(file)] || 'application/octet-stream' });
+    res.writeHead(200, {
+      'Content-Type': MIME[extname(file)] || 'application/octet-stream',
+      'Cache-Control': extname(file) === '.html' ? 'no-cache' : 'public, max-age=300',
+      ...SECURITY_HEADERS,
+    });
     res.end(data);
   } catch {
     send(res, 404, 'Not found');
@@ -79,6 +78,8 @@ const requireUserToken = (req) => {
 const validTrack = (t) => t && typeof t.title === 'string' && t.title.length < 500;
 
 const routes = {
+  'GET /healthz': async (req, res) => send(res, 200, { ok: true }),
+
   'GET /api/status': async (req, res, s) => send(res, 200, {
     spotifyConfigured: spotify.spotifyConfigured(),
     appleConfigured: apple.appleConfigured(),
@@ -180,7 +181,7 @@ const server = createServer(async (req, res) => {
   const url = new URL(req.url, BASE_URL);
   const handler = routes[`${req.method} ${url.pathname}`];
   try {
-    if (handler) return await handler(req, res, getSession(req, res), url);
+    if (handler) return await handler(req, res, loadSession(SESSION_KEY, req, res, { secure: SECURE }), url);
     if (req.method === 'GET') return await serveStatic(url.pathname, res);
     send(res, 404, { error: 'Not found' });
   } catch (e) {
@@ -189,8 +190,16 @@ const server = createServer(async (req, res) => {
   }
 });
 
-server.listen(PORT, () => {
-  console.log(`cmdshift running at ${BASE_URL}`);
+server.listen(PORT, HOST, () => {
+  console.log(`cmdshift listening on ${HOST}:${PORT} — public URL ${BASE_URL}`);
+  console.log(`  Spotify redirect URI: ${SPOTIFY_REDIRECT}`);
   if (!spotify.spotifyConfigured()) console.warn('  ! SPOTIFY_CLIENT_ID / SPOTIFY_CLIENT_SECRET not set — only text paste will work');
   if (!apple.appleConfigured()) console.warn('  ! APPLE_TEAM_ID / APPLE_KEY_ID / APPLE_PRIVATE_KEY(_PATH) not set — Apple Music won’t work');
 });
+
+for (const sig of ['SIGTERM', 'SIGINT']) {
+  process.on(sig, () => {
+    server.close(() => process.exit(0));
+    setTimeout(() => process.exit(0), 5000).unref();
+  });
+}

@@ -1,0 +1,11 @@
+.git
+.github
+node_modules
+test
+deploy
+.env
+.env.*
+*.p8
+*.md
+compose.yaml
+Dockerfile

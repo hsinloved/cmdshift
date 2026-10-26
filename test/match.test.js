@@ -58,3 +58,14 @@ test('parsePlaylistId accepts urls, uris and ids', () => {
   assert.equal(parsePlaylistId(id), id);
   assert.equal(parsePlaylistId('https://open.spotify.com/album/xyz'), null);
 });
+
+test('session cookies round-trip and reject tampering', async () => {
+  const { seal, unseal, sessionKey } = await import('../lib/session.js');
+  const key = sessionKey('secret');
+  const data = { spotify: { accessToken: 'x' }, exp: Date.now() + 1000 };
+  const sealed = seal(key, data);
+  assert.deepEqual(unseal(key, sealed), data);
+  assert.equal(unseal(sessionKey('other'), sealed), null);
+  assert.equal(unseal(key, sealed.slice(0, -2) + 'AA'), null);
+  assert.equal(unseal(key, seal(key, { exp: Date.now() - 1 })), null);
+});

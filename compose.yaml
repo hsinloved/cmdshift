@@ -1,0 +1,41 @@
+# Local:       docker compose up --build            → http://127.0.0.1:8888
+# Production:  DOMAIN=music.example.com docker compose --profile https up -d --build
+#              (Caddy fetches a Let's Encrypt certificate automatically)
+services:
+  app:
+    build: .
+    image: cmdshift
+    restart: unless-stopped
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      HOST: 0.0.0.0
+      PORT: 8888
+      # With the https profile, the public URL is your domain.
+      BASE_URL: ${BASE_URL:-http://127.0.0.1:8888}
+    volumes:
+      # Only needed if you use APPLE_PRIVATE_KEY_PATH instead of APPLE_PRIVATE_KEY.
+      - ./secrets:/app/secrets:ro
+    ports:
+      - "127.0.0.1:8888:8888"
+
+  caddy:
+    profiles: ["https"]
+    image: caddy:2-alpine
+    restart: unless-stopped
+    depends_on: [app]
+    environment:
+      DOMAIN: ${DOMAIN:-localhost}
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+
+volumes:
+  caddy_data:
+  caddy_config:
