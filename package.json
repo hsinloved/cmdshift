@@ -1,0 +1,13 @@
+{
+  "name": "cmdshift",
+  "version": "0.1.0",
+  "description": "Transfer Spotify playlists to Apple Music",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=20.6" },
+  "scripts": {
+    "start": "node --env-file-if-exists=.env server.js",
+    "dev": "node --watch --env-file-if-exists=.env server.js",
+    "test": "node --test"
+  }
+}

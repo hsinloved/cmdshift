@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>cmdshift — Spotify → Apple Music</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <header class="top">
+    <div class="brand">cmd<span>shift</span></div>
+    <p class="tag">Move a Spotify playlist into Apple Music.</p>
+  </header>
+
+  <main>
+    <div id="banner" class="banner" hidden></div>
+
+    <!-- Step 1: source -->
+    <section class="card" id="step-source">
+      <h2><span class="num">1</span> Choose a source</h2>
+      <div class="tabs" role="tablist">
+        <button class="tab active" data-tab="url" role="tab">Paste Spotify link</button>
+        <button class="tab" data-tab="login" role="tab">My Spotify playlists</button>
+        <button class="tab" data-tab="text" role="tab">Paste text / CSV</button>
+      </div>
+
+      <div class="pane" data-pane="url">
+        <form id="url-form" class="row">
+          <input id="url-input" type="text" placeholder="https://open.spotify.com/playlist/…" autocomplete="off">
+          <button class="btn primary" type="submit">Load</button>
+        </form>
+        <p class="hint">Works for public playlists. For private ones, use “My Spotify playlists”.</p>
+      </div>
+
+      <div class="pane" data-pane="login" hidden>
+        <div id="spotify-logged-out">
+          <a class="btn spotify" href="/auth/spotify/login">Log in with Spotify</a>
+        </div>
+        <div id="spotify-logged-in" hidden>
+          <div class="row between"><span class="muted">Connected to Spotify</span><button id="spotify-logout" class="btn link">Log out</button></div>
+          <ul id="playlist-list" class="playlists"></ul>
+        </div>
+      </div>
+
+      <div class="pane" data-pane="text" hidden>
+        <textarea id="text-input" rows="7" placeholder="One per line, e.g.&#10;Radiohead - Karma Police&#10;Bohemian Rhapsody by Queen&#10;&#10;…or a CSV with Title, Artist columns"></textarea>
+        <button id="text-load" class="btn primary">Use this list</button>
+      </div>
+
+      <div id="source-summary" class="summary" hidden></div>
+    </section>
+
+    <!-- Step 2: Apple Music + matching -->
+    <section class="card" id="step-match">
+      <h2><span class="num">2</span> Find tracks in Apple Music</h2>
+      <div class="row">
+        <button id="apple-connect" class="btn apple">Connect Apple Music</button>
+        <span id="apple-status" class="muted"></span>
+      </div>
+      <div class="row">
+        <button id="match-btn" class="btn primary" disabled>Find matches</button>
+        <div id="progress" class="progress" hidden><div class="bar"></div><span class="label"></span></div>
+      </div>
+
+      <div id="results" hidden>
+        <div class="row between wrap">
+          <div id="stats" class="stats"></div>
+          <div class="filters">
+            <label><input type="radio" name="filter" value="all" checked> All</label>
+            <label><input type="radio" name="filter" value="review"> Needs review</label>
+            <label><input type="radio" name="filter" value="missing"> Not found</label>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th></th><th>Spotify</th><th>Apple Music match</th><th>Status</th><th></th></tr></thead>
+            <tbody id="rows"></tbody>
+          </table>
+        </div>
+        <button id="export-missing" class="btn link">Download unmatched tracks (.csv)</button>
+      </div>
+    </section>
+
+    <!-- Step 3: create -->
+    <section class="card" id="step-create">
+      <h2><span class="num">3</span> Create the playlist</h2>
+      <div class="row">
+        <input id="pl-name" type="text" placeholder="Playlist name">
+        <button id="create-btn" class="btn primary" disabled>Create in Apple Music</button>
+      </div>
+      <div id="create-result" class="summary" hidden></div>
+    </section>
+  </main>
+
+  <dialog id="search-dialog">
+    <form method="dialog" class="dialog-body">
+      <h3>Search Apple Music</h3>
+      <div class="row">
+        <input id="search-term" type="text">
+        <button id="search-go" class="btn primary" value="search" type="button">Search</button>
+      </div>
+      <ul id="search-results" class="search-results"></ul>
+      <div class="row end"><button class="btn" value="cancel">Close</button></div>
+    </form>
+  </dialog>
+
+  <script type="module" src="/app.js"></script>
+</body>
+</html>
