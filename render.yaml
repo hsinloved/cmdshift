@@ -3,7 +3,7 @@
 # as a Redirect URI in your Spotify app.
 services:
   - type: web
-    name: spotty2apfel
+    name: cmdshift
     runtime: docker
     plan: free
     healthCheckPath: /healthz

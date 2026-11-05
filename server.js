@@ -191,7 +191,7 @@ const server = createServer(async (req, res) => {
 });
 
 server.listen(PORT, HOST, () => {
-  console.log(`Spotty2Apfel listening on ${HOST}:${PORT} — public URL ${BASE_URL}`);
+  console.log(`cmdshift listening on ${HOST}:${PORT} — public URL ${BASE_URL}`);
   console.log(`  Spotify redirect URI: ${SPOTIFY_REDIRECT}`);
   if (!spotify.spotifyConfigured()) console.warn('  ! SPOTIFY_CLIENT_ID / SPOTIFY_CLIENT_SECRET not set — only text paste will work');
   if (!apple.appleConfigured()) console.warn('  ! APPLE_TEAM_ID / APPLE_KEY_ID / APPLE_PRIVATE_KEY(_PATH) not set — Apple Music won’t work');

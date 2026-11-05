@@ -1,4 +1,4 @@
-# Spotty2Apfel
+# cmdshift
 
 A small, self-hosted alternative to TuneMyMusic's transfer page: take a Spotify playlist and rebuild it in Apple Music.
 
@@ -32,7 +32,7 @@ The free plan sleeps when idle, so the first request after a sleep takes about 3
 1. Point a DNS record (e.g. `music.example.com`) at the server, and open ports 80 and 443.
 2. On the server:
    ```bash
-   git clone <repo> spotty2apfel && cd spotty2apfel
+   git clone <repo> cmdshift && cd cmdshift
    cp .env.example .env
    # in .env set: BASE_URL=https://music.example.com, SESSION_SECRET, Spotify + Apple values
    mkdir -p secrets && cp ~/AuthKey_XXX.p8 secrets/AuthKey.p8   # if using APPLE_PRIVATE_KEY_PATH
