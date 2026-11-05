@@ -1,0 +1,4 @@
+{
+  "_comment": "folder name -> git remotes (owner/repo, globs allowed) that get that folder's skills",
+  "cmdshift": ["hsinloved/cmdshift"]
+}

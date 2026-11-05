@@ -1,0 +1,33 @@
+#!/bin/sh
+# Turn a pooled account off before it drains, and back on after its reset.
+#   cliproxy-account list
+#   cliproxy-account off <auth-file-name>
+#   cliproxy-account on  <auth-file-name>
+# Uses CLIProxyAPI's management API (/v0/management/auth-files[/status]).
+set -eu
+secrets="${CLIPROXY_SECRETS:-$HOME/.config/cliproxy/secrets.env}"
+# shellcheck disable=SC1090
+. "$secrets"
+: "${CLIPROXY_URL:?set CLIPROXY_URL in $secrets}"
+: "${CLIPROXY_MANAGEMENT_KEY:?set CLIPROXY_MANAGEMENT_KEY in $secrets}"
+api="${CLIPROXY_URL%/}/v0/management"
+auth="Authorization: Bearer $CLIPROXY_MANAGEMENT_KEY"
+
+case "${1:-list}" in
+  list)
+    curl -fsS -H "$auth" "$api/auth-files" | python3 -c '
+import json, sys
+for f in json.load(sys.stdin).get("files", []):
+    state = "off" if f.get("disabled") else ("cooling" if f.get("unavailable") else "on")
+    provider, name, email = f.get("provider") or "", f.get("name") or "", f.get("email") or ""
+    print(f"{state:8} {provider:8} {name:40} {email}")'
+    ;;
+  on|off)
+    name="${2:?auth file name, see: cliproxy-account list}"
+    disabled=$([ "$1" = off ] && echo true || echo false)
+    curl -fsS -X PATCH -H "$auth" -H 'Content-Type: application/json' \
+      -d "{\"name\":\"$name\",\"disabled\":$disabled}" "$api/auth-files/status"
+    echo
+    ;;
+  *) echo "usage: cliproxy-account list | on <name> | off <name>" >&2; exit 2 ;;
+esac

@@ -1,0 +1,18 @@
+{
+  "env": {
+    "ANTHROPIC_BASE_URL": "https://your-proxy.example.ts.net"
+  },
+  "apiKeyHelper": "~/.config/cliproxy/claude-key.sh",
+  "statusLine": {
+    "type": "command",
+    "command": "python3 ~/.config/cliproxy/statusline.py"
+  },
+  "hooks": {
+    "SessionStart": [
+      { "hooks": [{ "type": "command", "command": "python3 ~/agent-skills/bin/skills-hook.py start" }] }
+    ],
+    "SessionEnd": [
+      { "hooks": [{ "type": "command", "command": "python3 ~/agent-skills/bin/skills-hook.py end" }] }
+    ]
+  }
+}
