@@ -128,7 +128,7 @@ async function initMusicKit() {
   if (state.music) return state.music;
   const { token } = await api('/api/apple/developer-token');
   await loadMusicKitScript();
-  await MusicKit.configure({ developerToken: token, app: { name: 'cmdshift', build: '0.1.0' } });
+  await MusicKit.configure({ developerToken: token, app: { name: 'Spotty2Apfel', build: '0.1.0' } });
   state.music = MusicKit.getInstance();
   return state.music;
 }
@@ -301,7 +301,7 @@ $('#create-btn').addEventListener('click', async () => {
   try {
     const out = await api('/api/apple/playlists', {
       method: 'POST',
-      body: { name, description: 'Transferred from Spotify with cmdshift', songIds },
+      body: { name, description: 'Transferred from Spotify with Spotty2Apfel', songIds },
     });
     const skipped = state.rows.length - songIds.length;
     const el = $('#create-result');

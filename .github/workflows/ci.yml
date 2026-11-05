@@ -21,7 +21,7 @@ jobs:
         run: |
           SESSION_SECRET=ci node server.js &
           for i in $(seq 1 20); do curl -fsS http://127.0.0.1:8888/healthz && break; sleep 0.5; done
-          curl -fsS http://127.0.0.1:8888/ | grep -q cmdshift
+          curl -fsS http://127.0.0.1:8888/ | grep -q Spotty2Apfel
 
   docker:
     needs: test

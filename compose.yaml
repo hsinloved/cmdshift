@@ -4,7 +4,7 @@
 services:
   app:
     build: .
-    image: cmdshift
+    image: spotty2apfel
     restart: unless-stopped
     env_file:
       - path: .env
