@@ -1,0 +1,13 @@
+# Quiet Provenance
+
+**A visual philosophy of things observed versus things assumed.**
+
+Every surface in this movement is a ledger of certainty. Form is divided into two honest states: the solid mark, which records what was actually seen, and the hollow mark, which records what is merely expected. Nothing is decorated; everything is attested. Space is organised like a page of field notes kept by a patient observer: long horizontal rows, generous margins, hairline rules that separate one family of observations from the next. The emptiness between rows is not leftover. It is measured, deliberate and the product of painstaking calibration, so that the eye can rest and then return.
+
+Colour is restrained to the materials of a working notebook: warm unbleached paper, a single iron-gall ink in two densities, and one earthen accent used so sparingly that its every appearance reads as a verdict. The accent never fills a field; it marks a choice. Paper carries a faint, even grain, as though the sheet had been handled, never as a filter. Each tone is meticulously matched so the whole reads as one material object rather than a screen.
+
+Rhythm comes from accumulation. Dense rows of small, perfect circles repeat with slight variations in count and spacing, building a texture that rewards sustained viewing: from a distance a calm grey field, up close a census. Scale is held almost uniform so that the rare departure, a longer line or a coloured point, carries enormous weight. A single invisible threshold runs vertically through the composition, a ceiling that most marks approach and very few cross; tension lives entirely in that boundary.
+
+Composition is asymmetric but anchored. The dense observational field occupies the upper body of the page; below it, a wide band of silence; at the foot, the only typographic gesture of any size, set in a fine italic serif, accompanied by whisper-thin clinical labels in a monospaced hand. Typography is a specimen label, never a paragraph: plate numbers, a figure caption, a legend of two symbols. Every alignment snaps to a quiet underlying grid, the result of countless refinements.
+
+Hierarchy is earned, not announced. First the field, then the threshold, then the few accented marks, then the words. The work must look as though a master draughtsperson spent weeks ruling each line and placing each point by hand: master-level execution, nothing overlapping, nothing crowding the edge, every element with room to breathe. It is an artifact that argues, without saying so, that something as private and changeable as appetite can be observed with the same reverence as a natural phenomenon.
